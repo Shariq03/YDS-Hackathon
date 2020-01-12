@@ -1,0 +1,27 @@
+The problem statement clearly mentioned it to be a Forecasting Challenge, I was keen on applying Xgboost by formulating it into supervised regression problem because most of the information is captured in date-time features. 
+
+For XGBoost:
+__________________________________________________________________________________________________
+As the train data and test data are not on same level, I rolled-up the train data to Month level by summing up sales at Country, Year, Month, Product level. I merged both the tables as Promotional-Expense would be very important feature in predicting Sales as there was high correlation between Sales and Promotional-Expense which is at month level. However incorporating hoilday information into the train and test set was very tricky becuase there is more than one holiday every month. Also, most of the holidays occured in similar fashion, like the same holiady coming after another, holiday period being same,etc. Hence, I encoded the holiday feature using LabelEncoder and concatinated holidays at month level and again performed encoding. To get additional information, I included count of unique holidays month wise and holiday duration month wise. But later I found that the holiday duration month wise feature was not important and dropped it.
+
+Other features were: 
+'Product_ID_country_count' (no of products sold country wise to capture the significance of that product in that country), 'Product_ID_month_count' 'Month_mean', 'Month_min', 'Month_max',  (Mean sales, minimum sales, maximum sales month wise)
+'Product_ID_mean', 'Product_ID_min', 'Product_ID_max', (Mean sales, minimum sales, maximum sales product wise)'Country_mean', 'Country_min', 'Country_max (Mean sales, minimum sales, maximum sales country wise)
+ 
+These additional features boosted my score. Final model was averge of 2XGBoost models.
+
+
+For ARIMA:(I did not have enough time to find good p,d,q parameters)
+_____________________________________________________________________________________________________
+1.As the train data in on Merchant level, I doppped 'Merchant_ID' and rolled up the data to Product level by summing up the Sales values.
+2.To include time dimension in the train dataset, I added 'Day' (day of the Year) feature. Then formatted the string to datetime.
+3.The information of Year, Month and Week are captured in  Date, so I dropped these features. Added Date feature as the Index of dataframe.
+4.To bring the data down to datetime, the dataset was groupped with Country, Product_ID and stored each group in 'dataframes' list. 
+Now, ARIMA can be applied at this level (to each group seperately).
+5.Formatting every forecast dataframe according to Test Data. Added 'Month', 'Year' column. 
+Since the forecast is on week level, I added weekly sales in every month to roll it up to Month level.
+6.Joining all monthly forecast dataframes at country, product level into final dataframe('full_df') which can be merged with Test Data
+to get final results.
+
+ARIMA outperformed XGBoost model. However, my final model was average of ARIMA and 2XGBoost models. I did this so as to reduce the overall variance of the output.
+
